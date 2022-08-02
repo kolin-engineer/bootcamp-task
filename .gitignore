@@ -10,3 +10,6 @@ output/
 *.lock
 
 *.csv
+
+# *.mp4
+*.gif

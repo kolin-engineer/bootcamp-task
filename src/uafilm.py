@@ -3,12 +3,19 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from attr import validate
+from tabulate import tabulate
+
 
 @dataclass
 class Fieldnames:
     film_name: str = ""
     note: str = ""
     rating: str | int = 1
+
+    def __post_init__(self):
+        if self.rating not in range(1, 6):
+            raise ValueError(f"Rating should be within 1 and 5, not {self.rating}")
 
 
 class UAFilm:
@@ -45,8 +52,14 @@ class UAFilm:
             writer.writeheader()
             writer.writerows(self.__dump)
 
-    def read(self):
-        [print(line) for line in self._get_reader()]
+    def read(self, showindex: bool = False):
+        table = tabulate(
+            [line for line in self._get_reader()],
+            headers="firstrow",
+            tablefmt="psql",
+            showindex=showindex,
+        )
+        print(table)
 
     def update(self, current_film_name: str, **new_note: Any):
         "Update note in csv by film_name"
@@ -87,20 +100,20 @@ class UAFilm:
             print(sum([x["rating"] for x in self.__dump]) / len(self.__dump))
 
 
-lib = UAFilm()
-lib.create(film_name="adsff1", note="asfadfaf", rating=2)
-lib.create(film_name="adsff2", note="asfadfaf", rating=2)
-lib.create(film_name="adsff3", note="asfadfaf", rating=2)
-lib.create(film_name="adsff4", note="asfadfaf", rating=5)
-lib.update(
-    current_film_name="adsff3",
-    film_name="adsff3asdfasdfasfd",
-    note="asfadfaf",
-    rating=4,
-)
-lib.delete(film_name_to_del="adsff1")
-lib.read()
+# lib = UAFilm()
+# lib.create(film_name="adsff1", note="asfadfaf", rating=2)
+# lib.create(film_name="adsff2", note="asfadfaf", rating=2)
+# lib.create(film_name="adsff3", note="asfadfaf", rating=2)
+# lib.create(film_name="adsff4", note="asfadfaf", rating=5)
+# lib.update(
+#     current_film_name="adsff3",
+#     film_name="adsff3asdfasdfasfd",
+#     note="asfadfaf",
+#     rating=4,
+# )
+# lib.delete(film_name_to_del="adsff1")
+# lib.read()
 
-lib.get_top_rated()
-lib.get_low_rated()
-lib.get_avg_rating()
+# lib.get_top_rated()
+# lib.get_low_rated()
+# lib.get_avg_rating()pytes
